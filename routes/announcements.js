@@ -9,6 +9,16 @@ module.exports = {
     });
   },
   post: function(req, res) {
+    // check that user is admin
+    // we can't access app.get from here, so parse the config again
+    // TODO: find a better way than re-reading the file
+    var config = JSON.parse(require("fs").readFileSync("config.json"));
+
+    if (config.admins.indexOf(req.session.username) == -1) {
+      res.send(403); // You're not an admin! 403 forbidden, go away
+      return;
+    }
+
     // search the announcements collection for an entry that's the same week as the one we're trying to save
     db.collection("announcements").find({'monday': req.body.monday}).toArray(function(err, docs) {
       if (!err) {

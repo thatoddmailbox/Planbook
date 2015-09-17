@@ -44,6 +44,10 @@ app.configure(function() {
   app.engine("html", require("ejs").renderFile);
   app.set('view engine', 'html');
   app.set('views', __dirname + '/views');
+
+  // read config file
+  var config = JSON.parse(fs.readFileSync("config.json"));
+  app.set('admins', config.admins);
   
   app.use(express.bodyParser());
   
@@ -113,7 +117,7 @@ app.get('/friday', function(req, res) {
 });
 
 app.get('/admin', function(req, res) {
-  if (req.session.username == 'c17ak' || req.session.username == 'c17dh' || req.session.username == 'c16ac' || req.session.username == 'c17vs')
+  if (app.get("admins").indexOf(req.session.username) > -1) // check if user is admin
     res.render('admin.html');
   else
     res.redirect('/');
